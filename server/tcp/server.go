@@ -13,7 +13,7 @@ type Server struct {
 
 // Listen ...
 func (s *Server) Listen() {
-	l, e := net.Listen("tcp", ":9000")
+	l, e := net.Listen("tcp", ":6810")
 	if e != nil {
 		panic(e)
 	}
