@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"strconv"
 	"strings"
@@ -19,7 +20,14 @@ func (s *Server) readKey(r *bufio.Reader) (string, error) {
 	if e != nil {
 		return "", e
 	}
-	return string(k), nil
+	//判断是否应由当前节点处理
+	key := string(k)
+	addr, ok := s.ShouldProcess(key)
+	if !ok {
+		return "", errors.New("redirect " + addr)
+	}
+
+	return key, nil
 }
 
 func (s *Server) readKeyAndValue(r *bufio.Reader) (string, []byte, error) {
@@ -36,12 +44,19 @@ func (s *Server) readKeyAndValue(r *bufio.Reader) (string, []byte, error) {
 	if e != nil {
 		return "", nil, e
 	}
+	//判断是否应由当前节点处理
+	key := string(k)
+	addr, ok := s.ShouldProcess(key)
+	if !ok {
+		return "", nil, errors.New("redirect " + addr)
+	}
+
 	v := make([]byte, vlen)
 	_, e = io.ReadFull(r, v)
 	if e != nil {
 		return "", nil, e
 	}
-	return string(k), v, nil
+	return key, v, nil
 }
 
 // readLen 读取klen或者vlen

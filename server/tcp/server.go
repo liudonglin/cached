@@ -4,11 +4,13 @@ import (
 	"net"
 
 	"../cache"
+	"../cluster"
 )
 
 // Server ...
 type Server struct {
 	cache.Cache
+	cluster.Node
 }
 
 // Listen ...
@@ -27,6 +29,6 @@ func (s *Server) Listen() {
 }
 
 // New ...
-func New(c cache.Cache) *Server {
-	return &Server{c}
+func New(c cache.Cache, n cluster.Node) *Server {
+	return &Server{c, n}
 }
