@@ -51,7 +51,7 @@ func pipeline(client cacheclient.Client, cmds []*cacheclient.Cmd, r *result) {
 }
 
 func operate(id, count int, ch chan *result) {
-	client := cacheclient.New(typ, server)
+	client := cacheclient.New(typ, server, port)
 	cmds := make([]*cacheclient.Cmd, 0)
 	valuePrefix := strings.Repeat("a", valueSize)
 	r := &result{0, 0, 0, make([]statistic, 0)}
@@ -90,7 +90,7 @@ func operate(id, count int, ch chan *result) {
 }
 
 var typ, server, operation string
-var total, valueSize, threads, keyspacelen, pipelen int
+var total, valueSize, threads, keyspacelen, pipelen, port int
 
 func init() {
 	flag.StringVar(&typ, "type", "redis", "cache server type")
@@ -100,8 +100,22 @@ func init() {
 	flag.IntVar(&threads, "c", 1, "number of parallel connections")
 	flag.StringVar(&operation, "t", "set", "test set, could be get/set/mixed")
 	flag.IntVar(&keyspacelen, "r", 0, "keyspacelen, use random keys from 0 to keyspacelen-1")
-	flag.IntVar(&pipelen, "P", 1, "pipeline length")
+	flag.IntVar(&pipelen, "pip", 1, "pipeline length")
+	flag.IntVar(&port, "port", 0, "server port")
 	flag.Parse()
+
+	if port == 0 {
+		if typ == "redis" {
+			port = 6379
+		}
+		if typ == "http" {
+			port = 6800
+		}
+		if typ == "tcp" {
+			port = 6810
+		}
+	}
+
 	fmt.Println("type is", typ)
 	fmt.Println("server is", server)
 	fmt.Println("total", total, "requests")

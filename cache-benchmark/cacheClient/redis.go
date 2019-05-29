@@ -1,6 +1,8 @@
 package cacheclient
 
 import (
+	"fmt"
+
 	"github.com/go-redis/redis"
 )
 
@@ -74,6 +76,6 @@ func (r *redisClient) PipelinedRun(cmds []*Cmd) {
 	}
 }
 
-func newRedisClient(server string) *redisClient {
-	return &redisClient{redis.NewClient(&redis.Options{Addr: server + ":6379", ReadTimeout: -1})}
+func newRedisClient(server string, port int) *redisClient {
+	return &redisClient{redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", server, port), ReadTimeout: -1})}
 }

@@ -1,6 +1,7 @@
 package cacheclient
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -60,9 +61,9 @@ func (c *httpClient) Run(cmd *Cmd) {
 	panic("unknown cmd name " + cmd.Name)
 }
 
-func newHTTPClient(server string) *httpClient {
+func newHTTPClient(server string, port int) *httpClient {
 	client := &http.Client{Transport: &http.Transport{MaxIdleConnsPerHost: 1}}
-	return &httpClient{client, "http://" + server + ":12345/cache/"}
+	return &httpClient{client, fmt.Sprintf("http://%s:%d/cache/", server, port)}
 }
 
 func (c *httpClient) PipelinedRun([]*Cmd) {

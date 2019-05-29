@@ -12,15 +12,15 @@ type Client interface {
 	PipelinedRun([]*Cmd)
 }
 
-func New(typ, server string) Client {
+func New(typ, server string, port int) Client {
 	if typ == "redis" {
-		return newRedisClient(server)
+		return newRedisClient(server, port)
 	}
 	if typ == "http" {
-		return newHTTPClient(server)
+		return newHTTPClient(server, port)
 	}
 	if typ == "tcp" {
-		return newTCPClient(server)
+		return newTCPClient(server, port)
 	}
 	panic("unknown client type " + typ)
 }
