@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"../cache"
-	"../cluster"
+	"cached-server/cache"
+	"cached-server/cluster"
 )
 
 // Server ...

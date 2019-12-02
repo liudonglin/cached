@@ -4,10 +4,10 @@ import (
 	"flag"
 	"log"
 
-	"./cache"
-	"./cluster"
-	"./http"
-	"./tcp"
+	"cached-server/cache"
+	"cached-server/cluster"
+	"cached-server/http"
+	"cached-server/tcp"
 )
 
 var typ, node, clus string

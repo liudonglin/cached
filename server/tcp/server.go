@@ -3,8 +3,8 @@ package tcp
 import (
 	"net"
 
-	"../cache"
-	"../cluster"
+	"cached-server/cache"
+	"cached-server/cluster"
 )
 
 // Server ...
