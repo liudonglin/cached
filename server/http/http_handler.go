@@ -1,6 +1,8 @@
 package http
 
 import (
+	"cached-server/cache"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -17,6 +19,14 @@ func (h *cacheHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	addr, ok := h.ShouldProcess(key)
+	if !ok {
+		str, _ := json.Marshal(&cache.Result{Redirect: addr})
+		w.Write(str)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodPut:
 		data, _ := ioutil.ReadAll(r.Body)
@@ -37,7 +47,8 @@ func (h *cacheHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if len(val) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 		}
-		w.Write(val)
+		str, _ := json.Marshal(&cache.Result{Data: string(val)})
+		w.Write(str)
 		return
 	case http.MethodDelete:
 		e := h.Del(key)

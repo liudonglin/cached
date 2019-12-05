@@ -1,6 +1,7 @@
 package cacheclient
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,7 +30,11 @@ func (c *httpClient) get(key string) string {
 	if e != nil {
 		panic(e)
 	}
-	return string(b)
+
+	result := &Result{}
+	json.Unmarshal(b, result)
+
+	return result.Data
 }
 
 func (c *httpClient) set(key, value string) {
@@ -46,6 +51,16 @@ func (c *httpClient) set(key, value string) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		panic(resp.Status)
+	}
+	b, e := ioutil.ReadAll(resp.Body)
+	if e != nil {
+		panic(e)
+	}
+
+	result := &Result{}
+	json.Unmarshal(b, result)
+	if result.Redirect != "" {
+		print("redirect:" + result.Redirect)
 	}
 }
 

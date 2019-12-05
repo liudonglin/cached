@@ -24,7 +24,7 @@ func (s *Server) readKey(r *bufio.Reader) (string, error) {
 	key := string(k)
 	addr, ok := s.ShouldProcess(key)
 	if !ok {
-		return "", errors.New("redirect " + addr)
+		return "", errors.New("redirect:" + addr)
 	}
 
 	return key, nil
@@ -48,7 +48,7 @@ func (s *Server) readKeyAndValue(r *bufio.Reader) (string, []byte, error) {
 	key := string(k)
 	addr, ok := s.ShouldProcess(key)
 	if !ok {
-		return "", nil, errors.New("redirect " + addr)
+		return "", nil, errors.New("redirect:" + addr)
 	}
 
 	v := make([]byte, vlen)

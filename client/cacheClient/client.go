@@ -13,9 +13,6 @@ type Client interface {
 }
 
 func New(typ, server string, port int) Client {
-	if typ == "redis" {
-		return newRedisClient(server, port)
-	}
 	if typ == "http" {
 		return newHTTPClient(server, port)
 	}
