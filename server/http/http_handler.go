@@ -22,8 +22,9 @@ func (h *cacheHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	addr, ok := h.ShouldProcess(key)
 	if !ok {
-		str, _ := json.Marshal(&cache.Result{Redirect: addr})
+		str, _ := json.Marshal(&cache.Result{Redirect: h.Members()})
 		w.Write(str)
+		log.Println("Redirect:"+addr)
 		return
 	}
 

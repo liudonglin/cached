@@ -12,16 +12,23 @@ import (
 type httpClient struct {
 	*http.Client
 	server string
+	port   int
 }
 
-func (c *httpClient) get(key string) string {
-	resp, e := c.Get(c.server + key)
+func (c *httpClient) getUrl(key string) string {
+	server, _ := shouldProcess(key)
+	println("当前调用服务：" + server)
+	return fmt.Sprintf("http://%s:%d/cache/", server, c.port)
+}
+
+func (c *httpClient) get(key string) (string, bool) {
+	resp, e := c.Get(c.getUrl(key) + key)
 	if e != nil {
 		log.Println(key)
 		panic(e)
 	}
 	if resp.StatusCode == http.StatusNotFound {
-		return ""
+		return "", false
 	}
 	if resp.StatusCode != http.StatusOK {
 		panic(resp.Status)
@@ -34,12 +41,17 @@ func (c *httpClient) get(key string) string {
 	result := &Result{}
 	json.Unmarshal(b, result)
 
-	return result.Data
+	if result.Redirect != nil {
+		setNodes(result.Redirect)
+		return "", true
+	}
+
+	return result.Data, false
 }
 
-func (c *httpClient) set(key, value string) {
+func (c *httpClient) set(key, value string) bool {
 	req, e := http.NewRequest(http.MethodPut,
-		c.server+key, strings.NewReader(value))
+		c.getUrl(key)+key, strings.NewReader(value))
 	if e != nil {
 		log.Println(key)
 		panic(e)
@@ -59,26 +71,31 @@ func (c *httpClient) set(key, value string) {
 
 	result := &Result{}
 	json.Unmarshal(b, result)
-	if result.Redirect != "" {
-		print("redirect:" + result.Redirect)
+	if result.Redirect != nil {
+		setNodes(result.Redirect)
+		return true
 	}
+
+	return false
 }
 
 func (c *httpClient) Run(cmd *Cmd) {
+	retry := false
 	if cmd.Name == "get" {
-		cmd.Value = c.get(cmd.Key)
-		return
+		cmd.Value, retry = c.get(cmd.Key)
 	}
 	if cmd.Name == "set" {
-		c.set(cmd.Key, cmd.Value)
-		return
+		retry = c.set(cmd.Key, cmd.Value)
 	}
-	panic("unknown cmd name " + cmd.Name)
+
+	if retry {
+		c.Run(cmd)
+	}
 }
 
 func newHTTPClient(server string, port int) *httpClient {
 	client := &http.Client{Transport: &http.Transport{MaxIdleConnsPerHost: 1}}
-	return &httpClient{client, fmt.Sprintf("http://%s:%d/cache/", server, port)}
+	return &httpClient{client, server, port}
 }
 
 func (c *httpClient) PipelinedRun([]*Cmd) {

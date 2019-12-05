@@ -13,6 +13,9 @@ type Client interface {
 }
 
 func New(typ, server string, port int) Client {
+
+	setNodes([]string{server})
+
 	if typ == "http" {
 		return newHTTPClient(server, port)
 	}

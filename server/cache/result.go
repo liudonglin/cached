@@ -1,6 +1,6 @@
 package cache
 
 type Result struct {
-	Redirect string
+	Redirect []string
 	Data     string
 }
