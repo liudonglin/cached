@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"time"
 
+	"cached-server/consistent"
 	"github.com/hashicorp/memberlist"
-	"stathat.com/c/consistent"
 )
 
 // Node 接口
